@@ -73,25 +73,19 @@ Module.register("MMM-Flashcards", {
 		return this.config.header;
 	},
 
-	validKeyPress: function(kp) {
-		if (kp.keyName === this.keyHandler.config.map.correct) {
+	validButtonPress: function(button) {
+		if (button === "CORRECT") {
 			this.correctAnswer();
-		} else if (kp.keyName === this.keyHandler.config.map.wrong) {
+		} else if (button === "WRONG") {
 			this.wrongAnswer();
-		} else if (kp.keyName == this.keyHandler.config.map.flip){
+		} else if (button == "FLIP"){
 			this.showAnswer = !this.showAnswer;
 			this.updateDom();
-		} else if (kp.keyName == this.keyHandler.config.map.prefTopic){
-			this.prefTopic();
-		} else if (kp.keyName == this.keyHandler.config.map.nextTopic){
-			this.nextTopic();
-		}
-	},
-	hasFocus: function() {
-		// Optional: Do something now that you have focus.
-	},
-	lostFocus: function() {
-		// Optional: Do something now that you lost focus.
+		} // else if (kp.keyName == this.keyHandler.config.map.prefTopic){
+		// 	this.prefTopic();
+		// } else if (kp.keyName == this.keyHandler.config.map.nextTopic){
+		// 	this.nextTopic();
+		// }
 	},
 
 	correctAnswer: function(){
@@ -179,25 +173,9 @@ Module.register("MMM-Flashcards", {
 	},
 
 	notificationReceived: function(notification, payload){
-		if (notification === "MODULE_DOM_CREATED") {
-			// First combine our configs,
-			this.keyBindings = Object.assign({}, this.keyBindings, this.config.keyBindings);
-			// Register Key Handler
-			if (this.keyBindings.enabled && MM.getModules().filter(kb => kb.name === "MMM-KeyBindings").length > 0) {
-				// Then, register the handler definition,
-				KeyHandler.register(this.name, {
-					sendNotification: (n, p) => { this.sendNotification(n,p); }, // Reference to send notifications
-					validKeyPress: (kp) => { this.validKeyPress(kp); }, // Your Key Press Function
-					onFocus: () => { this.hasFocus(); }, // Do something when you get focus
-					onFocusReleased: () => { this.lostFocus(); } // Do something when focus is lost
-				});
-				// Finally, create the handler.
-				this.keyHandler = KeyHandler.create(this.name, this.keyBindings);
-			}
-		}
-		// For all future notifications, check if it is a key press and if we should worry about it.
-		if (this.keyHandler && this.keyHandler.validate(notification, payload)) {
-			return;
+		// For all notifications, check if it is a button press and what to do
+		if (notification === 'FLASHCARDS_BUTTON') {
+			this.validButtonPress(payload);
 		}
 	},
 
