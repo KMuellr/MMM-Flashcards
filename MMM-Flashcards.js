@@ -48,17 +48,6 @@ Module.register("MMM-Flashcards", {
 		],
 
 	},
-	keyBindings: {
-		enabled: true,
-		mode: "DEFAULT",
-		map: {
-			correct: "ArrowRight",
-			wrong: "ArrowLeft",
-			flip: "Home",
-			prefTopic: "ArrowUp",
-			nextTopic: "ArrowDown",
-		}
-	},
 	settings:{},
 	allNames:[],
 	collection:"",
@@ -74,18 +63,18 @@ Module.register("MMM-Flashcards", {
 	},
 
 	validButtonPress: function(button) {
-		if (button === "CORRECT") {
+		if (button == "CORRECT") {
 			this.correctAnswer();
-		} else if (button === "WRONG") {
+		} else if (button == "WRONG") {
 			this.wrongAnswer();
 		} else if (button == "FLIP"){
 			this.showAnswer = !this.showAnswer;
 			this.updateDom();
-		} // else if (kp.keyName == this.keyHandler.config.map.prefTopic){
-		// 	this.prefTopic();
-		// } else if (kp.keyName == this.keyHandler.config.map.nextTopic){
-		// 	this.nextTopic();
-		// }
+		} else if (button == "PREV_TOPIC"){
+			this.prevTopic();
+		} else if (button == "NEXT_TOPIC"){
+			this.nextTopic();
+		}
 	},
 
 	correctAnswer: function(){
@@ -96,7 +85,7 @@ Module.register("MMM-Flashcards", {
 		this.sendSocketNotification("FLASHCARDS_WRONG",{});
 	},
 
-	prefTopic: function(){
+	prevTopic: function(){
 		this.sendSocketNotification("FLASHCARDS_PREVCOLLECTION",{});
 	},
 	nextTopic: function(){
@@ -108,7 +97,11 @@ Module.register("MMM-Flashcards", {
 		var self = this;
 		this.settings.nbBuckets = this.config.nbBuckets;
 		this.settings.step = this.config.step;
-		this.settings.topics = this.config.topics;
+		if (typeof this.config.topics === "string") {
+			this.settings.topics = require('./'.concat(this.config.topics));
+		} else {
+			this.settings.topics = this.config.topics;	
+		}
 		this.settings.collections = this.config.collections;
 		this.sendSocketNotification("FLASHCARDS_INIT",this.settings);
 	},
